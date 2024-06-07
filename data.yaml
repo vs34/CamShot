@@ -1,0 +1,15 @@
+
+path: ../datasets/hooman
+train: train/images
+val: test/images
+test: test/images
+
+nc: 2
+names: ['Human', 'human']
+
+roboflow:
+  workspace: yolo-lkgro
+  project: human-detection-qrsic
+  version: 3
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/yolo-lkgro/human-detection-qrsic/dataset/3
