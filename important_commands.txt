@@ -1,0 +1,9 @@
+to install vs build tools on conda:
+
+  conda install -c conda-forge vs2015_runtime
+  conda install -c conda-forge libpython
+  conda install -c conda-forge m2w64-toolchain
+
+
+
+
