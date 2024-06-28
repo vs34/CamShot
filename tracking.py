@@ -1,9 +1,6 @@
 import cv2
 from ultralytics import YOLO
 
-idcords = {}
-
-
 def draw_text_with_background(img, text, pos, font, font_scale, font_thickness, text_color, bg_color):
     text_size, _ = cv2.getTextSize(text, font, font_scale, font_thickness)
     text_w, text_h = text_size
@@ -12,7 +9,6 @@ def draw_text_with_background(img, text, pos, font, font_scale, font_thickness, 
     bg_x2, bg_y2 = x + text_w, y + 5
     cv2.rectangle(img, (bg_x1, bg_y1), (bg_x2, bg_y2), bg_color, cv2.FILLED)
     cv2.putText(img, text, (x, y), font, font_scale, text_color, font_thickness)
-    
 
 def coords(b):
     box = b.xyxy[0].cpu().numpy() 
@@ -35,32 +31,35 @@ def show_cam_with_boxes(model, source, interval=5):
     while cap.isOpened():
         success, frame = cap.read()
         if success:
-            results = model.track(frame, persist=True, device="cuda")
+            results = model.track(frame, persist=True, device="cuda",classes=[0])
             annotated_frame = results[0].plot()
 
             height,width, _ = annotated_frame.shape
 
-            liney = int(height // 2) 
-            cv2.line(annotated_frame, (0, liney), (width, liney), (0, 0, 255), 2)
+            liney = int(width // 2) 
+            cv2.line(annotated_frame, (liney, 0), (liney, height), (0, 0, 0), 5)
 
             print(width,height,_)
 
             for b in results[0].boxes:
+                if b is None or b.id is None or len(b.id) == 0:
+                    continue
                 id = int(b.id[0])
                 x, y = coords(b)
                 
                 if id in location.keys():
                     prevx,prevy=location[id]
-                    if (y <= liney and prevy > liney):
+                    if (x<=liney and prevx>=liney):
                         inside+=1
 
-                    if (y > liney and prevy <= liney):
+                    if (x>=liney and prevx<=liney):
                         outside+=1
                 
                 location[id] = (x, y)
                 
             text = f"people count: {len(results[0].boxes)} inside: {inside}, outside: {outside}"
-            cv2.putText(annotated_frame, text, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+            #cv2.putText(annotated_frame, text, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+            draw_text_with_background(annotated_frame, text, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, 2, (0, 255, 0),(0,0,0))
             cv2.imshow("YOLOv8 Tracking", annotated_frame)
 
             frame_count += 1
@@ -73,11 +72,11 @@ def show_cam_with_boxes(model, source, interval=5):
     cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-    model = YOLO("bestonetarushlvda.pt")
+    model = YOLO("yolov8n.pt")
 
     vid = "C:/Users/dell/Downloads/cctv_stock.mp4"
     cam = "0"
 
-    source = vid
+    source = cam
 
-    show_cam_with_boxes(model, source)
+    show_cam_with_boxes(model, 0)
