@@ -51,10 +51,10 @@ def show_cam_with_boxes(model, source, interval=5):
                 
                 if id in location.keys():
                     prevx,prevy=location[id]
-                    if (y<=liney and prevy>=liney):
+                    if (y <= liney and prevy > liney):
                         inside+=1
 
-                    if (y>=liney and prevy<=liney):
+                    if (y > liney and prevy <= liney):
                         outside+=1
                 
                 location[id] = (x, y)
