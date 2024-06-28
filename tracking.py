@@ -36,7 +36,7 @@ def show_cam_with_boxes(model, source, interval=5):
 
             height,width, _ = annotated_frame.shape
 
-            liney = int(width // 2) 
+            liney = int(height // 2) 
             cv2.line(annotated_frame, (liney, 0), (liney, height), (0, 0, 0), 5)
 
             print(width,height,_)
@@ -48,12 +48,12 @@ def show_cam_with_boxes(model, source, interval=5):
                 x, y = coords(b)
                 
                 if id in location.keys():
-                    prevx,prevy=location[id]
-                    if (x<=liney and prevx>=liney):
-                        inside+=1
+                    prevx,prevy = location[id]
+                    if (y < liney and prevy > liney):
+                        inside += 1
 
-                    if (x>=liney and prevx<=liney):
-                        outside+=1
+                    if (y > liney and prevy < liney):
+                        outside += 1
                 
                 location[id] = (x, y)
                 
